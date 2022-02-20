@@ -2,10 +2,116 @@
 </html>
 <head>
     <title>Minecraft [Custom JavaScript Edition]</title>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
 </head>
 <body>
     <script src = "three.js"></script>
+    <script src = "perlin.js"></script>
+    <script src = "PointerLockControls.js"></script>
     <script src = "text/javascript">
+        noise.seed(Math.random());
+        
+        // Getting everything setted up
+        var scene = new THREE.Scene();
+        var renderer = new THREE.WebGLRenderer();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+        var camera = new THREE.PerspectiveCamera(75, window.innerwidth / window.innerHeight, 0.1, 1000);
+        
+        // Creating the ground
+        /*
+        var groundBox = new THREE.BoxBufferGeometry(25, 1, 50);
+        var groundMesh = new THREE.MeshBasicMaterial({color: 0x00ff00});
+        var ground = new THREE.Mesh(groundBox, groundMesh);
+        scene.add(ground);
+        ground.position.y = -5;
+        
+        // Creating the border lines of the ground
+        var edges = new THREE.EdgesGeometry(groundBox);
+        var line = new THREE.LineSegments(edges, new THREE.LineBasicMaterial({color: 0x00ff00}));
+        scene.add(line);
+        line.position.y = -5;
+        */
+        
+        function Block(x, y, z){
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            
+            this.display = function(){
+                var blockBox = new THREE.BoxBufferGeometry(5, 5, 5); //w, h, d
+                var blockMesh = new THREE.MeshBasicMaterial({color: 0x00ff00});
+                var block = new THREE.Mesh(blockBox, blockMesh);
+                scene.add(block);
+                block.position.x = this.x;
+                block.position.y = this.y - 10;
+                block.position.z = this.z;
+                
+                var edges = new THREE.EdgesGeometry(blockBox);
+                var line = new THREE.LineSegment(edges, new THREE.LineBasicMaterial({color: 0xffffff}));
+                scene.add(line);
+                line.position.x = x;
+                line.position.y - 10;
+                line.position.z = z;
+            }
+        }
+        
+        var blocks = [];
+        var xoff = 0;
+        var zoff = 0;
+        var inc = 0.05;
+        var amplitude = 100;
+        for(var x = 0; x < 20; x++){
+            xoff = 0;
+            for(var z = 0; z < 20; z++){
+                var v = Math.round(noise.perlin2(xoff, yoff) * amplitude / 5) * 5;
+                blocks.push(new Blocks(x * 5, v, z * 5));
+                xoff = xoff + inc;
+            }
+            yoff = yoff = inc;
+        }
+        
+        for(var i = 0; i < blocks.length; i++){
+            blocks[i].display();
+        }
+        
+        var controls = new THREE.PointerLockControls(camera, document.body);
+        document.body.addEventListener("click", function(){
+            controls.lock();
+        });
+        controls.addEventListener("lock", function(){
+            
+        });
+        controls.addEventListener("unlock", function(){
+            
+        });
+        
+        function update(){
+        
+        }
+        
+        // Resize Window
+        windowaddEventListener("resize", function(){
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+        });
+        
+        function render(){
+            renderer.render(scene, camera);
+        }
+        
+        function GameLoop(){
+            requestAnimationFrame(GameLoop);
+            update();
+            render();
+        }
+        
+        GameLoop();
     </script>
     </body>
 </html>
